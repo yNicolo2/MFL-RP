@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MFL Emergency Hamburg RP</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Inter,system-ui,Arial;
+    background:#05070c;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* ================= PARTICULAS ================= */
+
+#particles{position:fixed;inset:0;z-index:-1}
+.p{
+    position:absolute;
+    width:6px;height:6px;border-radius:50%;
+    opacity:.12;
+    animation:rise linear infinite;
+}
+@keyframes rise{
+    from{transform:translateY(100vh)}
+    to{transform:translateY(-10vh)}
+}
+
+/* ================= LOADER ================= */
+
+#loader{
+    position:fixed;inset:0;
+    background:#05070c;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    z-index:9999;
+}
+
+.loader-logo{
+    width:220px;
+    border-radius:22px;
+    padding:16px;
+    background:rgba(255,255,255,.04);
+    box-shadow:
+      inset 0 0 18px rgba(255,255,255,.06),
+      0 0 25px rgba(0,170,255,.35);
+    animation:breath 3s ease-in-out infinite;
+}
+
+@keyframes breath{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.02)}
+}
+
+.loader-text{
+    font-size:13px;
+    letter-spacing:1px;
+    opacity:.7;
+}
+
+.progress{
+    width:260px;height:5px;
+    background:#111;border-radius:10px;
+    overflow:hidden;
+}
+.bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,#0077ff,#00ffaa);
+}
+
+/* ================= MAIN ================= */
+
+.container{
+    max-width:1300px;
+    margin:auto;
+    padding:40px 30px 80px;
+    display:none;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:26px;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+    position:relative;
+    border-radius:22px;
+    height:260px;
+    overflow:hidden;
+    backdrop-filter:blur(14px);
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    transition:.45s cubic-bezier(.22,1,.36,1);
+    opacity:0;
+    transform:translateY(40px);
+}
+
+.card.show{
+    opacity:1;
+    transform:none;
+}
+
+.card::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:22px;
+    background:linear-gradient(90deg,red,blue,red);
+    filter:blur(14px);
+    opacity:.25;
+    transition:.3s;
+    z-index:-1;
+}
+
+.card:hover{
+    transform:translateY(-6px) scale(1.02);
+}
+
+.card:hover::before{
+    opacity:.6;
+}
+
+.card img{
+    width:100%;height:100%;
+    object-fit:cover;
+}
+
+/* ================= LOGO ================= */
+
+.logo-card{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo-card img{
+    width:70%;
+    object-fit:contain;
+    border-radius:18px;
+    animation:breath 4s ease-in-out infinite;
+}
+
+/* ================= HERO ================= */
+
+.wide{grid-column:span 2}
+
+.hero img{
+    animation:zoom 18s ease-in-out infinite;
+}
+@keyframes zoom{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.06)}
+}
+
+.overlay{
+    position:absolute;
+    bottom:16px;left:16px;
+    background:rgba(0,0,0,.6);
+    padding:12px 18px;
+    border-radius:14px;
+    font-weight:600;
+}
+
+/* ================= DISCORD ================= */
+
+.discord{
+    background:linear-gradient(135deg,#5865F2,#3b45c5);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    text-align:center;
+}
+
+.discord img{
+    width:110px;
+    height:110px;
+    object-fit:contain;
+    border-radius:50%;
+    background:rgba(255,255,255,.1);
+    padding:14px;
+}
+
+.members{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:15px;
+    color:white;
+    opacity:.9;
+}
+
+.dot{
+    width:7px;height:7px;
+    background:#22c55e;
+    border-radius:50%;
+}
+
+.discord a{
+    background:white;
+    color:#5865F2;
+    padding:12px 26px;
+    border-radius:14px;
+    font-weight:600;
+    text-decoration:none;
+    transition:.25s;
+}
+.discord a:hover{
+    transform:scale(1.07);
+}
+
+/* ================= CODE (DONUTSMP STYLE) ================= */
+
+.code-box{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+}
+
+.code{
+    font-size:26px;
+    letter-spacing:4px;
+    background:#111;
+    padding:14px 26px;
+    border-radius:14px;
+    transition:.3s;
+}
+
+.copy-btn{
+    background:#0ea5e9;
+    border:none;
+    color:white;
+    padding:10px 24px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.copy-btn.copied{
+    background:#22c55e;
+}
+
+.copy-msg{
+    font-size:13px;
+    opacity:.7;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    margin-top:60px;
+    text-align:center;
+    opacity:.5;
+    font-size:13px;
+}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .wide{grid-column:span 1}
+}
+</style>
+</head>
+
+<body>
+
+<div id="particles"></div>
+
+<div id="loader">
+    <img src="logo.png" class="loader-logo">
+    <div class="loader-text" id="loaderText">Conectando a servicios…</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+
+<audio id="sirena" src="sirena.mp3"></audio>
+<audio id="hoverSound" src="hover.mp3"></audio>
+
+<div class="container" id="content">
+<div class="grid">
+
+<div class="card logo-card">
+    <img src="logo.png">
+</div>
+
+<div class="card wide hero">
+    <img src="control-policial.png">
+    <div class="overlay">Emergency Hamburg RP 🇪🇸</div>
+</div>
+
+<div class="card discord">
+    <img src="discord.png">
+    <div class="members"><span class="dot"></span>17 miembros</div>
+    <a href="https://discord.gg/5YE48VERKm" target="_blank">Unirse al Discord</a>
+</div>
+
+<div class="card code-box wide">
+    <h2>Código del Servidor</h2>
+    <div class="code" id="serverCode">dd8i2uc8</div>
+    <button class="copy-btn" id="copyBtn">Copiar código</button>
+    <div class="copy-msg" id="copyMsg"></div>
+</div>
+
+</div>
+
+<footer>
+© 2026 Emergency Hamburg RP — MFL
+</footer>
+</div>
+
+<script>
+
+/* PARTICULAS */
+for(let i=0;i<22;i++){
+ let d=document.createElement("div");
+ d.className="p";
+ d.style.left=Math.random()*100+"vw";
+ d.style.animationDuration=(8+Math.random()*6)+"s";
+ d.style.background=Math.random()>.5?"#00aaff":"#ff3333";
+ particles.appendChild(d);
+}
+
+/* LOADER 2s */
+const texts=[
+ "Conectando a servicios…",
+ "Cargando unidades…",
+ "Sincronizando radio…"
+];
+let t=0;
+setInterval(()=>loaderText.textContent=texts[t++%texts.length],600);
+
+sirena.volume=0;
+sirena.play().catch(()=>{});
+let v=0;
+let fade=setInterval(()=>{v+=.05;sirena.volume=v;if(v>=1)clearInterval(fade)},50);
+
+let p=0;
+let load=setInterval(()=>{
+ p+=5;bar.style.width=p+"%";
+ if(p>=100){
+  clearInterval(load);
+  sirena.pause();
+  loader.style.display="none";
+  content.style.display="block";
+  document.querySelectorAll(".card").forEach((c,i)=>{
+    setTimeout(()=>c.classList.add("show"),i*120);
+  });
+ }
+},100);
+
+/* COPY DONUTSMP STYLE */
+copyBtn.onclick=()=>{
+ navigator.clipboard.writeText(serverCode.textContent);
+ copyBtn.classList.add("copied");
+ copyMsg.textContent="✔ Código copiado";
+ setTimeout(()=>{
+  copyBtn.classList.remove("copied");
+  copyMsg.textContent="";
+ },1800);
+};
+
+/* HOVER SOUND */
+document.querySelectorAll("button,a,.card").forEach(el=>{
+ el.addEventListener("mouseenter",()=>{
+  hoverSound.currentTime=0;
+  hoverSound.volume=.25;
+  hoverSound.play().catch(()=>{});
+ });
+});
+</script>
+
+</body>
+</html>
