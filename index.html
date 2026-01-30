@@ -15,8 +15,7 @@ body{
     overflow-x:hidden;
 }
 
-/* ================= PARTICULAS ================= */
-
+/* PARTICULAS */
 #particles{position:fixed;inset:0;z-index:-1}
 .p{
     position:absolute;
@@ -29,8 +28,7 @@ body{
     to{transform:translateY(-10vh)}
 }
 
-/* ================= LOADER ================= */
-
+/* LOADER */
 #loader{
     position:fixed;inset:0;
     background:#05070c;
@@ -44,7 +42,7 @@ body{
 
 .loader-logo{
     width:220px;
-    border-radius:22px;
+    border-radius:26px;
     padding:16px;
     background:rgba(255,255,255,.04);
     box-shadow:
@@ -74,8 +72,7 @@ body{
     background:linear-gradient(90deg,#0077ff,#00ffaa);
 }
 
-/* ================= MAIN ================= */
-
+/* MAIN */
 .container{
     max-width:1300px;
     margin:auto;
@@ -89,8 +86,7 @@ body{
     gap:26px;
 }
 
-/* ================= CARDS ================= */
-
+/* CARDS */
 .card{
     position:relative;
     border-radius:22px;
@@ -114,10 +110,9 @@ body{
     position:absolute;
     inset:-2px;
     border-radius:22px;
-    background:linear-gradient(90deg,red,blue,red);
+    background:linear-gradient(90deg,#ff0033,#6b00ff,#ff0033);
     filter:blur(14px);
     opacity:.25;
-    transition:.3s;
     z-index:-1;
 }
 
@@ -130,12 +125,12 @@ body{
 }
 
 .card img{
-    width:100%;height:100%;
+    width:100%;
+    height:100%;
     object-fit:cover;
 }
 
-/* ================= LOGO ================= */
-
+/* LOGO MFL (SOLO BORDES, NADA MÁS) */
 .logo-card{
     display:flex;
     align-items:center;
@@ -145,12 +140,11 @@ body{
 .logo-card img{
     width:70%;
     object-fit:contain;
-    border-radius:18px;
+    border-radius:32px; /* 🔥 bordes tipo icono */
     animation:breath 4s ease-in-out infinite;
 }
 
-/* ================= HERO ================= */
-
+/* HERO */
 .wide{grid-column:span 2}
 
 .hero img{
@@ -170,8 +164,7 @@ body{
     font-weight:600;
 }
 
-/* ================= DISCORD ================= */
-
+/* DISCORD */
 .discord{
     background:linear-gradient(135deg,#5865F2,#3b45c5);
     display:flex;
@@ -196,8 +189,6 @@ body{
     align-items:center;
     gap:6px;
     font-size:15px;
-    color:white;
-    opacity:.9;
 }
 
 .dot{
@@ -215,12 +206,9 @@ body{
     text-decoration:none;
     transition:.25s;
 }
-.discord a:hover{
-    transform:scale(1.07);
-}
+.discord a:hover{transform:scale(1.07)}
 
-/* ================= CODE (DONUTSMP STYLE) ================= */
-
+/* CODIGO */
 .code-box{
     display:flex;
     flex-direction:column;
@@ -229,13 +217,28 @@ body{
     gap:14px;
 }
 
-.code{
+.code-wrap{
+    display:flex;
+    align-items:center;
+    gap:12px;
     font-size:26px;
     letter-spacing:4px;
     background:#111;
     padding:14px 26px;
     border-radius:14px;
-    transition:.3s;
+}
+
+.copy-icon{
+    width:22px;
+    height:22px;
+    cursor:pointer;
+    opacity:.85;
+    transition:.25s;
+}
+
+.copy-icon:hover{
+    transform:scale(1.15);
+    opacity:1;
 }
 
 .copy-btn{
@@ -248,17 +251,14 @@ body{
     font-weight:600;
 }
 
-.copy-btn.copied{
-    background:#22c55e;
-}
+.copy-btn.copied{background:#22c55e}
 
 .copy-msg{
     font-size:13px;
     opacity:.7;
 }
 
-/* ================= FOOTER ================= */
-
+/* FOOTER */
 footer{
     margin-top:60px;
     text-align:center;
@@ -266,6 +266,7 @@ footer{
     font-size:13px;
 }
 
+/* RESPONSIVE */
 @media(max-width:900px){
     .grid{grid-template-columns:1fr}
     .wide{grid-column:span 1}
@@ -284,7 +285,6 @@ footer{
 </div>
 
 <audio id="sirena" src="sirena.mp3"></audio>
-<audio id="hoverSound" src="hover.mp3"></audio>
 
 <div class="container" id="content">
 <div class="grid">
@@ -295,7 +295,7 @@ footer{
 
 <div class="card wide hero">
     <img src="control-policial.png">
-    <div class="overlay">Emergency Hamburg RP 🇪🇸</div>
+    <div class="overlay">MFL — Emergency Hamburg RP</div>
 </div>
 
 <div class="card discord">
@@ -306,7 +306,10 @@ footer{
 
 <div class="card code-box wide">
     <h2>Código del Servidor</h2>
-    <div class="code" id="serverCode">dd8i2uc8</div>
+    <div class="code-wrap">
+        <span>dd8i2uc8</span>
+        <img src="copy.png" class="copy-icon" id="copyIcon">
+    </div>
     <button class="copy-btn" id="copyBtn">Copiar código</button>
     <div class="copy-msg" id="copyMsg"></div>
 </div>
@@ -319,7 +322,6 @@ footer{
 </div>
 
 <script>
-
 /* PARTICULAS */
 for(let i=0;i<22;i++){
  let d=document.createElement("div");
@@ -330,7 +332,7 @@ for(let i=0;i<22;i++){
  particles.appendChild(d);
 }
 
-/* LOADER 2s */
+/* LOADER */
 const texts=[
  "Conectando a servicios…",
  "Cargando unidades…",
@@ -340,7 +342,10 @@ let t=0;
 setInterval(()=>loaderText.textContent=texts[t++%texts.length],600);
 
 sirena.volume=0;
-sirena.play().catch(()=>{});
+document.body.addEventListener("click",()=>{
+ sirena.play().catch(()=>{});
+},{once:true});
+
 let v=0;
 let fade=setInterval(()=>{v+=.05;sirena.volume=v;if(v>=1)clearInterval(fade)},50);
 
@@ -358,9 +363,9 @@ let load=setInterval(()=>{
  }
 },100);
 
-/* COPY DONUTSMP STYLE */
-copyBtn.onclick=()=>{
- navigator.clipboard.writeText(serverCode.textContent);
+/* COPY */
+const copyAction=()=>{
+ navigator.clipboard.writeText("dd8i2uc8");
  copyBtn.classList.add("copied");
  copyMsg.textContent="✔ Código copiado";
  setTimeout(()=>{
@@ -369,14 +374,8 @@ copyBtn.onclick=()=>{
  },1800);
 };
 
-/* HOVER SOUND */
-document.querySelectorAll("button,a,.card").forEach(el=>{
- el.addEventListener("mouseenter",()=>{
-  hoverSound.currentTime=0;
-  hoverSound.volume=.25;
-  hoverSound.play().catch(()=>{});
- });
-});
+copyBtn.onclick=copyAction;
+copyIcon.onclick=copyAction;
 </script>
 
 </body>
