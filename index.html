@@ -75,8 +75,10 @@ body{
     margin:auto;
     padding:40px 30px 80px;
     display:none;
+    transition:.35s ease;
 }
 
+/* GRID */
 .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -264,7 +266,7 @@ footer{
     font-size:13px;
 }
 
-/* BOTONES PC / CELULAR */
+/* BOTONES */
 .view-buttons{
     margin-top:14px;
     display:flex;
@@ -287,9 +289,11 @@ footer{
     transform:scale(1.08);
 }
 
-/* MODO CELULAR */
+/* ====== MODO CELULAR (25% MÁS GRANDE) ====== */
 body.mobile .container{
     max-width:420px;
+    transform:scale(1.25);
+    transform-origin:top center;
 }
 
 body.mobile .grid{
@@ -404,7 +408,7 @@ const copyAction=()=>{
 copyBtn.onclick=copyAction;
 copyIcon.onclick=copyAction;
 
-/* BOTONES VISTA */
+/* VISTAS */
 pcBtn.onclick=()=>document.body.classList.remove("mobile");
 mobileBtn.onclick=()=>document.body.classList.add("mobile");
 </script>
