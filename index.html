@@ -28,48 +28,45 @@ body{
     to{transform:translateY(-10vh)}
 }
 
-/* LOADER */
+/* ================= LOADER ================= */
 #loader{
-    position:fixed;inset:0;
-    background:#05070c;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    gap:18px;
+    position:fixed;
+    inset:0;
+    background:black;
     z-index:9999;
+    transition:opacity 1.2s ease;
 }
 
-.loader-logo{
-    width:220px;
-    border-radius:26px;
-    padding:16px;
-    background:rgba(255,255,255,.04);
-    box-shadow:
-      inset 0 0 18px rgba(255,255,255,.06),
-      0 0 25px rgba(0,170,255,.35);
-    animation:breath 3s ease-in-out infinite;
+#loader.fade-out{
+    opacity:0;
+    pointer-events:none;
 }
 
-@keyframes breath{
-    0%,100%{transform:scale(1)}
-    50%{transform:scale(1.02)}
-}
-
-.loader-text{
-    font-size:13px;
-    letter-spacing:1px;
-    opacity:.7;
+#loaderBg{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
 }
 
 .progress{
-    width:260px;height:5px;
-    background:#111;border-radius:10px;
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    width:70%;
+    max-width:900px;
+    height:10px;
+    background:black;
+    border-radius:20px;
     overflow:hidden;
 }
+
 .bar{
-    height:100%;width:0%;
-    background:linear-gradient(90deg,#0077ff,#00ffaa);
+    height:100%;
+    width:0%;
+    background:#fbbf24;
+    transition:width .25s linear;
 }
 
 /* MAIN */
@@ -120,17 +117,13 @@ body{
     transform:translateY(-6px) scale(1.02);
 }
 
-.card:hover::before{
-    opacity:.6;
-}
-
 .card img{
     width:100%;
     height:100%;
     object-fit:cover;
 }
 
-/* LOGO MFL (SOLO BORDES, NADA MÁS) */
+/* LOGO */
 .logo-card{
     display:flex;
     align-items:center;
@@ -140,8 +133,13 @@ body{
 .logo-card img{
     width:70%;
     object-fit:contain;
-    border-radius:32px; /* 🔥 bordes tipo icono */
+    border-radius:32px;
     animation:breath 4s ease-in-out infinite;
+}
+
+@keyframes breath{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.02)}
 }
 
 /* HERO */
@@ -266,6 +264,42 @@ footer{
     font-size:13px;
 }
 
+/* BOTONES PC / CELULAR */
+.view-buttons{
+    margin-top:14px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+}
+
+.view-buttons button{
+    background:#22c55e;
+    border:none;
+    color:#052e16;
+    padding:10px 26px;
+    border-radius:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.view-buttons button:hover{
+    transform:scale(1.08);
+}
+
+/* MODO CELULAR */
+body.mobile .container{
+    max-width:420px;
+}
+
+body.mobile .grid{
+    grid-template-columns:1fr;
+}
+
+body.mobile .wide{
+    grid-column:span 1;
+}
+
 /* RESPONSIVE */
 @media(max-width:900px){
     .grid{grid-template-columns:1fr}
@@ -278,13 +312,11 @@ footer{
 
 <div id="particles"></div>
 
+<!-- LOADER -->
 <div id="loader">
-    <img src="logo.png" class="loader-logo">
-    <div class="loader-text" id="loaderText">Conectando a servicios…</div>
+    <div id="loaderBg"></div>
     <div class="progress"><div class="bar" id="bar"></div></div>
 </div>
-
-<audio id="sirena" src="sirena.mp3"></audio>
 
 <div class="container" id="content">
 <div class="grid">
@@ -319,6 +351,12 @@ footer{
 <footer>
 © 2026 Emergency Hamburg RP — MFL
 </footer>
+
+<div class="view-buttons">
+    <button id="pcBtn">PC</button>
+    <button id="mobileBtn">Celular</button>
+</div>
+
 </div>
 
 <script>
@@ -333,35 +371,25 @@ for(let i=0;i<22;i++){
 }
 
 /* LOADER */
-const texts=[
- "Conectando a servicios…",
- "Cargando unidades…",
- "Sincronizando radio…"
-];
-let t=0;
-setInterval(()=>loaderText.textContent=texts[t++%texts.length],600);
-
-sirena.volume=0;
-document.body.addEventListener("click",()=>{
- sirena.play().catch(()=>{});
-},{once:true});
-
-let v=0;
-let fade=setInterval(()=>{v+=.05;sirena.volume=v;if(v>=1)clearInterval(fade)},50);
+const loaders=["loader1.png","loader2.png","loader3.png","loader4.png"];
+loaderBg.style.backgroundImage=`url(${loaders[Math.random()*4|0]})`;
 
 let p=0;
 let load=setInterval(()=>{
- p+=5;bar.style.width=p+"%";
+ p+=1;
+ bar.style.width=p+"%";
  if(p>=100){
   clearInterval(load);
-  sirena.pause();
-  loader.style.display="none";
-  content.style.display="block";
-  document.querySelectorAll(".card").forEach((c,i)=>{
-    setTimeout(()=>c.classList.add("show"),i*120);
-  });
+  setTimeout(()=>loader.classList.add("fade-out"),300);
+  setTimeout(()=>{
+    loader.style.display="none";
+    content.style.display="block";
+    document.querySelectorAll(".card").forEach((c,i)=>{
+      setTimeout(()=>c.classList.add("show"),i*120);
+    });
+  },1400);
  }
-},100);
+},40);
 
 /* COPY */
 const copyAction=()=>{
@@ -373,9 +401,12 @@ const copyAction=()=>{
   copyMsg.textContent="";
  },1800);
 };
-
 copyBtn.onclick=copyAction;
 copyIcon.onclick=copyAction;
+
+/* BOTONES VISTA */
+pcBtn.onclick=()=>document.body.classList.remove("mobile");
+mobileBtn.onclick=()=>document.body.classList.add("mobile");
 </script>
 
 </body>
