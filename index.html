@@ -28,6 +28,72 @@ body{
     to{transform:translateY(-10vh)}
 }
 
+/* ================= SELECTOR DE MODO ================= */
+#modeSelector{
+    position:fixed;
+    inset:0;
+    background:#05070c;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:40px;
+    z-index:10000;
+    transition:opacity 0.8s ease;
+}
+
+#modeSelector.hide{
+    opacity:0;
+    pointer-events:none;
+}
+
+#modeSelector h1{
+    font-size:42px;
+    margin:0;
+    background:linear-gradient(135deg,#ff0033,#6b00ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+}
+
+#modeSelector p{
+    font-size:18px;
+    opacity:0.7;
+    margin:0;
+}
+
+.mode-options{
+    display:flex;
+    gap:30px;
+}
+
+.mode-option{
+    background:rgba(255,255,255,0.05);
+    border:2px solid rgba(255,255,255,0.1);
+    border-radius:20px;
+    padding:40px 60px;
+    cursor:pointer;
+    transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
+    text-align:center;
+}
+
+.mode-option:hover{
+    transform:translateY(-8px) scale(1.05);
+    border-color:#22c55e;
+    background:rgba(34,197,94,0.1);
+}
+
+.mode-option h2{
+    font-size:32px;
+    margin:0 0 15px 0;
+}
+
+.mode-option p{
+    font-size:15px;
+    opacity:0.6;
+    margin:0;
+}
+
 /* ================= LOADER ================= */
 #loader{
     position:fixed;
@@ -35,6 +101,11 @@ body{
     background:black;
     z-index:9999;
     transition:opacity 1.2s ease;
+    display:none;
+}
+
+#loader.active{
+    display:block;
 }
 
 #loader.fade-out{
@@ -291,17 +362,91 @@ footer{
 
 /* ====== MODO CELULAR (25% MÁS GRANDE) ====== */
 body.mobile .container{
-    max-width:420px;
-    transform:scale(1.25);
-    transform-origin:top center;
+    max-width: 90%;
 }
 
 body.mobile .grid{
-    grid-template-columns:1fr;
+    grid-template-columns: 1fr;
+    gap: 32px;
 }
 
 body.mobile .wide{
-    grid-column:span 1;
+    grid-column: span 1;
+}
+
+body.mobile .card{
+    height: 325px;
+    border-radius: 28px;
+}
+
+body.mobile .card::before{
+    border-radius: 28px;
+}
+
+body.mobile .logo-card img{
+    width: 80%;
+}
+
+body.mobile .overlay{
+    bottom: 20px;
+    left: 20px;
+    padding: 15px 22px;
+    border-radius: 18px;
+    font-size: 18px;
+}
+
+body.mobile .discord img{
+    width: 137px;
+    height: 137px;
+}
+
+body.mobile .discord{
+    gap: 20px;
+}
+
+body.mobile .members{
+    font-size: 19px;
+}
+
+body.mobile .discord a{
+    padding: 15px 32px;
+    border-radius: 18px;
+    font-size: 18px;
+}
+
+body.mobile .code-box h2{
+    font-size: 28px;
+}
+
+body.mobile .code-wrap{
+    font-size: 32px;
+    padding: 18px 32px;
+    border-radius: 18px;
+}
+
+body.mobile .copy-icon{
+    width: 28px;
+    height: 28px;
+}
+
+body.mobile .copy-btn{
+    padding: 12px 30px;
+    border-radius: 15px;
+    font-size: 18px;
+}
+
+body.mobile .copy-msg{
+    font-size: 16px;
+}
+
+body.mobile footer{
+    font-size: 16px;
+}
+
+body.mobile .view-buttons button{
+    padding: 12px 32px;
+    border-radius: 18px;
+    font-size: 18px;
 }
 
 /* RESPONSIVE */
@@ -316,7 +461,25 @@ body.mobile .wide{
 
 <div id="particles"></div>
 
-<!-- LOADER -->
+<!-- SELECTOR DE MODO (aparece primero) -->
+<div id="modeSelector">
+    <h1>🎮 MFL Emergency Hamburg RP</h1>
+    <p>Selecciona tu tipo de dispositivo:</p>
+    
+    <div class="mode-options">
+        <div class="mode-option" onclick="startWithMode('pc')">
+            <h2>💻 PC</h2>
+            <p>Pantalla grande</p>
+        </div>
+        
+        <div class="mode-option" onclick="startWithMode('mobile')">
+            <h2>📱 Celular</h2>
+            <p>Optimizado para móvil</p>
+        </div>
+    </div>
+</div>
+
+<!-- LOADER (aparece después de elegir) -->
 <div id="loader">
     <div id="loaderBg"></div>
     <div class="progress"><div class="bar" id="bar"></div></div>
@@ -374,26 +537,48 @@ for(let i=0;i<22;i++){
  particles.appendChild(d);
 }
 
-/* LOADER */
-const loaders=["loader1.png","loader2.png","loader3.png","loader4.png"];
-loaderBg.style.backgroundImage=`url(${loaders[Math.random()*4|0]})`;
+/* FUNCIÓN PARA INICIAR CON EL MODO SELECCIONADO */
+function startWithMode(mode) {
+    // Aplicar el modo seleccionado
+    if(mode === 'mobile') {
+        document.body.classList.add('mobile');
+    }
+    
+    // Ocultar selector
+    modeSelector.classList.add('hide');
+    
+    // Mostrar y activar loader después de 800ms
+    setTimeout(() => {
+        modeSelector.style.display = 'none';
+        loader.classList.add('active');
+        
+        // Iniciar loader
+        startLoader();
+    }, 800);
+}
 
-let p=0;
-let load=setInterval(()=>{
- p+=1;
- bar.style.width=p+"%";
- if(p>=100){
-  clearInterval(load);
-  setTimeout(()=>loader.classList.add("fade-out"),300);
-  setTimeout(()=>{
-    loader.style.display="none";
-    content.style.display="block";
-    document.querySelectorAll(".card").forEach((c,i)=>{
-      setTimeout(()=>c.classList.add("show"),i*120);
-    });
-  },1400);
- }
-},40);
+/* LOADER */
+function startLoader() {
+    const loaders=["loader1.png","loader2.png","loader3.png","loader4.png"];
+    loaderBg.style.backgroundImage=`url(${loaders[Math.random()*4|0]})`;
+
+    let p=0;
+    let load=setInterval(()=>{
+        p+=1;
+        bar.style.width=p+"%";
+        if(p>=100){
+            clearInterval(load);
+            setTimeout(()=>loader.classList.add("fade-out"),300);
+            setTimeout(()=>{
+                loader.style.display="none";
+                content.style.display="block";
+                document.querySelectorAll(".card").forEach((c,i)=>{
+                    setTimeout(()=>c.classList.add("show"),i*120);
+                });
+            },1400);
+        }
+    },40);
+}
 
 /* COPY */
 const copyAction=()=>{
@@ -408,7 +593,7 @@ const copyAction=()=>{
 copyBtn.onclick=copyAction;
 copyIcon.onclick=copyAction;
 
-/* VISTAS */
+/* VISTAS (para cambiar después de haber cargado) */
 pcBtn.onclick=()=>document.body.classList.remove("mobile");
 mobileBtn.onclick=()=>document.body.classList.add("mobile");
 </script>
