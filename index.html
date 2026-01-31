@@ -266,6 +266,12 @@ body{
     width:7px;height:7px;
     background:#22c55e;
     border-radius:50%;
+    animation:pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:1}
+    50%{opacity:0.5}
 }
 
 .discord a{
@@ -337,6 +343,38 @@ footer{
     font-size:13px;
 }
 
+/* CONTROL DE AUDIO */
+.audio-control{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    z-index:9998;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:50%;
+    width:60px;
+    height:60px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:all 0.3s ease;
+}
+
+.audio-control:hover{
+    transform:scale(1.1);
+    background:rgba(255,255,255,0.15);
+}
+
+.audio-control.show{
+    display:flex;
+}
+
+.audio-icon{
+    font-size:24px;
+}
+
 /* BOTONES */
 .view-buttons{
     margin-top:14px;
@@ -385,6 +423,7 @@ body.mobile .card::before{
 
 body.mobile .logo-card img{
     width: 80%;
+    border-radius: 40px; /* 32px * 1.25 */
 }
 
 body.mobile .overlay{
@@ -499,7 +538,10 @@ body.mobile .view-buttons button{
 
 <div class="card discord">
     <img src="discord.png">
-    <div class="members"><span class="dot"></span>17 miembros</div>
+    <div class="members">
+        <span class="dot"></span>
+        <span id="memberCount">Cargando...</span>
+    </div>
     <a href="https://discord.gg/5YE48VERKm" target="_blank">Unirse al Discord</a>
 </div>
 
@@ -526,7 +568,58 @@ body.mobile .view-buttons button{
 
 </div>
 
+<!-- AUDIO DE FONDO -->
+<audio id="bgMusic" loop>
+    <source src="inst.mp3" type="audio/mpeg">
+    <source src="inst.ogg" type="audio/ogg">
+</audio>
+
+<!-- CONTROL DE AUDIO -->
+<div class="audio-control" id="audioControl" title="Mutear/Desmutear">
+    <span class="audio-icon" id="audioIcon">🔊</span>
+</div>
+
 <script>
+/* ================= AUDIO CON FADE-IN ================= */
+const bgMusic = document.getElementById('bgMusic');
+const audioControl = document.getElementById('audioControl');
+const audioIcon = document.getElementById('audioIcon');
+let isMuted = false;
+
+// Función para fade-in del audio (de 0 a 1 en 3 segundos)
+function fadeInAudio() {
+    bgMusic.volume = 0;
+    bgMusic.play();
+    
+    let volume = 0;
+    const fadeInterval = setInterval(() => {
+        if (volume < 1) {
+            volume += 0.02; // Incremento gradual
+            bgMusic.volume = Math.min(volume, 1);
+        } else {
+            clearInterval(fadeInterval);
+        }
+    }, 60); // Cada 60ms (3 segundos total)
+    
+    // Mostrar control de audio después de iniciar
+    setTimeout(() => {
+        audioControl.classList.add('show');
+    }, 1000);
+}
+
+// Control de mute/unmute
+audioControl.onclick = () => {
+    if (isMuted) {
+        bgMusic.volume = 1;
+        audioIcon.textContent = '🔊';
+        isMuted = false;
+    } else {
+        bgMusic.volume = 0;
+        audioIcon.textContent = '🔇';
+        isMuted = true;
+    }
+};
+
 /* PARTICULAS */
 for(let i=0;i<22;i++){
  let d=document.createElement("div");
@@ -537,8 +630,35 @@ for(let i=0;i<22;i++){
  particles.appendChild(d);
 }
 
+/* ================= CONTADOR DE DISCORD REAL ================= */
+// 🔥 CÓDIGO DE INVITACIÓN DE TU SERVIDOR
+const DISCORD_INVITE_CODE = '5YE48VERKm';
+
+async function getDiscordMembers() {
+    try {
+        // Usar proxy CORS para evitar bloqueos del navegador
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`)}`);
+        const proxyData = await response.json();
+        const data = JSON.parse(proxyData.contents);
+        
+        // Obtener el número de miembros
+        const totalMembers = data.approximate_member_count || 20;
+        const onlineMembers = data.approximate_presence_count || 0;
+        
+        // Actualizar el contador en la página
+        document.getElementById('memberCount').textContent = `${totalMembers} miembros • ${onlineMembers} online`;
+        
+    } catch (error) {
+        console.error('Error al obtener datos de Discord:', error);
+        document.getElementById('memberCount').textContent = '20 miembros';
+    }
+}
+
 /* FUNCIÓN PARA INICIAR CON EL MODO SELECCIONADO */
 function startWithMode(mode) {
+    // Iniciar audio con fade-in
+    fadeInAudio();
+    
     // Aplicar el modo seleccionado
     if(mode === 'mobile') {
         document.body.classList.add('mobile');
@@ -575,6 +695,12 @@ function startLoader() {
                 document.querySelectorAll(".card").forEach((c,i)=>{
                     setTimeout(()=>c.classList.add("show"),i*120);
                 });
+                
+                // 🔥 CARGAR CONTADOR DE DISCORD AL MOSTRAR EL PANEL
+                getDiscordMembers();
+                
+                // Actualizar cada 30 segundos
+                setInterval(getDiscordMembers, 30000);
             },1400);
         }
     },40);
