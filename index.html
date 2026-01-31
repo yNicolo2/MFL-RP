@@ -589,32 +589,58 @@ let isMuted = false;
 // Función para fade-in del audio (de 0 a 1 en 3 segundos)
 function fadeInAudio() {
     bgMusic.volume = 0;
-    bgMusic.play();
     
-    let volume = 0;
-    const fadeInterval = setInterval(() => {
-        if (volume < 1) {
-            volume += 0.02; // Incremento gradual
-            bgMusic.volume = Math.min(volume, 1);
-        } else {
-            clearInterval(fadeInterval);
-        }
-    }, 60); // Cada 60ms (3 segundos total)
+    // Intentar reproducir el audio
+    const playPromise = bgMusic.play();
     
-    // Mostrar control de audio después de iniciar
-    setTimeout(() => {
-        audioControl.classList.add('show');
-    }, 1000);
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            // Audio se reproduce correctamente
+            let volume = 0;
+            const fadeInterval = setInterval(() => {
+                if (volume < 1) {
+                    volume += 0.02;
+                    bgMusic.volume = Math.min(volume, 1);
+                } else {
+                    clearInterval(fadeInterval);
+                }
+            }, 60);
+            
+            // Mostrar control de audio
+            setTimeout(() => {
+                audioControl.classList.add('show');
+            }, 1000);
+        }).catch(error => {
+            // Si falla el autoplay, mostrar control para que el usuario active manualmente
+            console.log('Autoplay bloqueado, esperando interacción del usuario');
+            audioControl.classList.add('show');
+            audioIcon.textContent = '🔇';
+            isMuted = true;
+        });
+    }
 }
 
 // Control de mute/unmute
 audioControl.onclick = () => {
     if (isMuted) {
-        bgMusic.volume = 1;
+        bgMusic.volume = 0;
+        bgMusic.play().then(() => {
+            // Fade-in al activar
+            let volume = 0;
+            const fadeInterval = setInterval(() => {
+                if (volume < 1 && !isMuted) {
+                    volume += 0.05;
+                    bgMusic.volume = Math.min(volume, 1);
+                } else {
+                    clearInterval(fadeInterval);
+                }
+            }, 50);
+        });
         audioIcon.textContent = '🔊';
         isMuted = false;
     } else {
         bgMusic.volume = 0;
+        bgMusic.pause();
         audioIcon.textContent = '🔇';
         isMuted = true;
     }
